@@ -2,6 +2,7 @@ const { body, validationResult } = require("express-validator");
 const express = require("express");
 const fetchUser = require("../middleware/fetchUser");
 const Blog = require("../models/Blog");
+const User = require("../models/User");
 const router = express.Router();
 
 // Add All Blogs
@@ -39,9 +40,6 @@ router.post(
       "description",
       "Description should be contains atleast 5 characters!"
     ).isLength({ min: 5 }),
-    body("author", "Author should be contains atleast a character!").isLength({
-      min: 1,
-    }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -49,12 +47,13 @@ router.post(
       res.status(400).json({ errors: errors.array() });
     }
     try {
-      const { author, title, description } = req.body;
+      const { title, description } = req.body;
+      let { name } = await User.findById(req.user.id);
       const blog = await Blog.create({
         user: req.user.id,
         title,
         description,
-        author,
+        author: name,
       });
       res.json(blog);
     } catch (err) {
