@@ -6,7 +6,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 
-// Get Secret-Key from .env file 
+// Get Secret-Key from .env file
 require("dotenv").config();
 const Secret_Key = process.env["Secret_Key"];
 
@@ -25,12 +25,12 @@ router.post(
     }),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       let user = await User.findOne({ email: req.body.email });
 
       if (user) {
@@ -75,12 +75,11 @@ router.post(
   ],
 
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
       let user = await User.findOne({ email: req.body.email });
 
       if (!user) {
@@ -106,6 +105,13 @@ router.post(
         },
       };
 
+      let sessionTime = Date.now();
+      user = await User.findByIdAndUpdate(
+        user.id,
+        { $set: { sessionTime: sessionTime } },
+        { new: true }
+      );
+
       const authToken = jwt.sign(data, Secret_Key);
 
       res.json({ authToken });
@@ -117,10 +123,49 @@ router.post(
 
 // Verify User by auth-token
 
-router.get("/", fetchUser, async (req, res) => {
+router.get("/getUserDetails", fetchUser, async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await User.findById(userId).select("-password");
+    res.json(user);
+  } catch (err) {
+    res.status(500).send("INTERNAL SERVER ERROR");
+  }
+});
+
+// Update User Details
+
+router.post("/updateUserDetails", fetchUser, async (req, res) => {
+  try {
+    const { name, password, description } = req.body;
+
+    const updatedUser = {};
+
+    if (name && name != "") {
+      updatedUser.name = name;
+    }
+
+    if (password && password != "") {
+      const salt = await bcrypt.genSalt(5);
+      const secPass = await bcrypt.hash(password, salt);
+      updatedUser.password = secPass;
+    }
+
+    if (description && description != "") {
+      updatedUser.description = description;
+    }
+
+    let user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).send("NOT FOUND!");
+    }
+
+    user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updatedUser },
+      { new: true }
+    );
     res.json(user);
   } catch (err) {
     res.status(500).send("INTERNAL SERVER ERROR");

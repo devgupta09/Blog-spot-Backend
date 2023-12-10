@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Add All Blogs
 
-router.get("/getAllBlogs", async (req, res) => {
+router.get("/getAllBlogs", fetchUser, async (req, res) => {
   try {
     const blogs = await Blog.find({});
     res.json(blogs);
@@ -42,11 +42,11 @@ router.post(
     ).isLength({ min: 5 }),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-    }
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+      }
       const { title, description } = req.body;
       let { name } = await User.findById(req.user.id);
       const blog = await Blog.create({
@@ -62,7 +62,21 @@ router.post(
   }
 );
 
-//Update a Blog
+// Get Blog Details
+
+router.put("/getBlogDetails/:id", fetchUser, async (req, res) => {
+  try {
+    let blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).send("NOT FOUND!");
+    }
+    res.json(blog);
+  } catch (err) {
+    res.status(500).send("INTERNAL SERVER ERROR");
+  }
+});
+
+// Update a Blog
 
 router.put(
   "/updateBlog/:id",
