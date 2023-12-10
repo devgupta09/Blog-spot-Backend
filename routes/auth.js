@@ -114,7 +114,7 @@ router.post(
 
       const authToken = jwt.sign(data, Secret_Key);
 
-      res.json({ authToken });
+      res.json({ authToken: authToken, sessionTimeout: sessionTime });
     } catch (err) {
       res.status(500).send("INTERNAL SERVER ERROR");
     }
