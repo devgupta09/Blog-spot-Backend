@@ -24,6 +24,8 @@ app.get("/", (req, res) => {
   res.send("Welcome to Blog-spot Application ! ");
 });
 
+console.log(port)
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
