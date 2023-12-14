@@ -3,6 +3,7 @@ const fetchUser = require("../middleware/fetchUser");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const Blog = require("../models/Blog");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 
@@ -105,6 +106,8 @@ router.post(
         },
       };
 
+      let name = user.name;
+
       let sessionTime = Date.now();
       user = await User.findByIdAndUpdate(
         user.id,
@@ -114,7 +117,11 @@ router.post(
 
       const authToken = jwt.sign(data, Secret_Key);
 
-      res.json({ authToken: authToken, sessionTimeout: sessionTime });
+      res.json({
+        authToken: authToken,
+        sessionTimeout: sessionTime,
+        name: name,
+      });
     } catch (err) {
       res.status(500).send("INTERNAL SERVER ERROR");
     }
@@ -126,7 +133,12 @@ router.post(
 router.get("/getUserDetails", fetchUser, async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId).select("-password");
+    const blogsCount = await Blog.countDocuments({ user: userId });
+    let user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { totalBlogs: blogsCount } },
+      { new: true, select: "-password" }
+    );
     res.json(user);
   } catch (err) {
     res.status(500).send("INTERNAL SERVER ERROR");
@@ -137,13 +149,9 @@ router.get("/getUserDetails", fetchUser, async (req, res) => {
 
 router.post("/updateUserDetails", fetchUser, async (req, res) => {
   try {
-    const { name, password, description } = req.body;
+    const { password, description } = req.body;
 
     const updatedUser = {};
-
-    if (name && name != "") {
-      updatedUser.name = name;
-    }
 
     if (password && password != "") {
       const salt = await bcrypt.genSalt(5);
