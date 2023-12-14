@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const connectToMongo = require("./db");
+require("dotenv");
 
 // Connect To Mongo DB
 
@@ -10,7 +11,7 @@ const app = express();
 app.use(cors());
 
 // Set PORT APP listning to
-const port = 8000;
+const port = process.env["PORT"];
 
 app.use(express.json());
 
