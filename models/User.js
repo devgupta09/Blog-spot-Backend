@@ -7,6 +7,7 @@ const userSchema = mongoose.Schema({
   description: { type: String, required: false, default: "" },
   createdAt: { type: Date, default: Date.now },
   sessionTime: { type: Date },
+  totalBlogs: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model("user", userSchema);
