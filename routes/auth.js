@@ -13,12 +13,6 @@ const Secret_Key = process.env["Secret_Key"];
 
 // Signup API for creating a new user
 
-router.get('/home',async (req,res)=>{
-  res.json("Auth Page working fine")
-})
-
-console.log(Secret_Key)
-
 router.post(
   "/signUp",
   [
@@ -73,7 +67,7 @@ router.post(
 // Signin API for login as a user
 
 router.post(
-  "/signin",
+  "/signIn",
   [
     body("email", "Enter a vaid email!").isEmail(),
     body("password", "Password can not be empty!").isLength({

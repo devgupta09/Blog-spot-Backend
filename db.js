@@ -5,7 +5,7 @@ const mongooURI = process.env["MOONGODB_URI"];
 
 const connectToMongo = () => {
   mongoose.connect(mongooURI);
-  console.log("Connect to Moongo DB!");
+  console.log("Connected to Moongo DataBase!");
 };
 
 module.exports = connectToMongo;

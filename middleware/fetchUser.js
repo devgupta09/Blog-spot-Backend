@@ -22,7 +22,6 @@ const fetchUser = async (req, res, next) => {
     req.user = data.user;
     next();
   } catch (err) {
-    console.log(err);
     res.status(400).send("Not Found!");
   }
 };

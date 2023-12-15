@@ -14,11 +14,15 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use("/auth", require("./routes/auth"));
-app.use("/blog", require("./routes/blog"));
+app.use("/", require("./routes/blog"));
 
 // Basic get API
 app.get("/", (req, res) => {
   res.send("Welcome to Blog-spot Application!");
+});
+
+app.listen(port, () => {
+  console.log(`App listening to port ${port}`);
 });
 
 module.exports = app;
