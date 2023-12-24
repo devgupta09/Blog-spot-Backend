@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Set PORT APP listening to
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use("/auth", require("./routes/auth"));
 app.use("/", require("./routes/blog"));
