@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Get Secret-Key from .env file
 require("dotenv").config();
-const Secret_Key = process.env["Secret_Key"];
+const Secret_Key = process.env.Secret_Key;
 
 // Signup API for creating a new user
 
